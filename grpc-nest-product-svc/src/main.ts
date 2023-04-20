@@ -5,13 +5,14 @@ import { join } from 'path';
 import { AppModule } from './app.module';
 import { protobufPackage } from './product/product.pb';
 
+
 async function bootstrap() {
   const app: INestMicroservice = await NestFactory.createMicroservice(AppModule, {
     transport: Transport.GRPC,
     options: {
       url: '0.0.0.0:50053',
       package: protobufPackage,
-      protoPath: join('node_modules/nest-proto/proto/product.proto'),
+      protoPath: join('../nest-proto/proto/product.proto'),
     },
   });
 

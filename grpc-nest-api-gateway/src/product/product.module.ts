@@ -12,7 +12,7 @@ import { PRODUCT_PACKAGE_NAME, PRODUCT_SERVICE_NAME } from './product.pb';
         options: {
           url: '0.0.0.0:50053',
           package: PRODUCT_PACKAGE_NAME,
-          protoPath: 'node_modules/nest-proto/proto/product.proto',
+          protoPath: '../nest-proto/proto/product.proto',
         },
       }
     ])

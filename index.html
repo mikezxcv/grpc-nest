@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Editor Jodit con botones personalizados</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jodit/3.24.2/jodit.es2018.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jodit/3.24.2/jodit.es2018.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/es.min.js"></script>
+  </head>
+  <body>
+    <textarea id="editor"></textarea>
+
+    <script>
+      moment.locale("es");
+      Jodit.defaultOptions.controls.funciones = {
+        icon: "dropdown",
+        tooltip: "My Dropdown",
+        list: {
+          option1: "Numero a Texto",
+          option2: "Fecha a Texto",
+          insertDate: "Insert Current Date",
+        },
+        exec: function (editor, _, control, key) {
+          const selectedOption = control.control.name;
+          if (selectedOption === "option1") {
+            const inputDialog = $("<div>", { class: "input-dialog" }).appendTo(
+              "body"
+            );
+            const input = $("<input>", {
+              type: "number",
+              placeholder: "Ingrese un número",
+            }).appendTo(inputDialog);
+            const okButton = $("<button>", { text: "Aceptar" }).appendTo(
+              inputDialog
+            );
+            const cancelButton = $("<button>", { text: "Cancelar" }).appendTo(
+              inputDialog
+            );
+
+            input.focus();
+
+            okButton.on("click", function () {
+              const value = input.val();
+              const numberToText = convertirNumeroATexto(value);
+              editor.s.insertHTML(numberToText);
+              inputDialog.remove();
+            });
+
+            cancelButton.on("click", function () {
+              inputDialog.remove();
+            });
+
+            inputDialog.on("keydown", function (event) {
+              if (event.keyCode === 27) {
+                // 27 = Esc key
+                inputDialog.remove();
+              }
+            });
+
+            return false;
+          }
+          if (selectedOption === "option2") {
+            const inputDialog = $("<div>", { class: "input-dialog" }).appendTo(
+              "body"
+            );
+            const input = $("<input>", {
+              type: "text",
+              placeholder: "Ingrese una fecha (DD/MM/YYYY)",
+            }).appendTo(inputDialog);
+            const okButton = $("<button>", { text: "Aceptar" }).appendTo(
+              inputDialog
+            );
+            const cancelButton = $("<button>", { text: "Cancelar" }).appendTo(
+              inputDialog
+            );
+
+            input.focus();
+
+            okButton.on("click", function () {
+              const value = input.val();
+              const fecha = moment(value, "DD/MM/YYYY");
+              const texto = fecha.format("DD [de] MMMM [del] YYYY");
+              editor.s.insertHTML(texto);
+              inputDialog.remove();
+            });
+
+            cancelButton.on("click", function () {
+              inputDialog.remove();
+            });
+
+            inputDialog.on("keydown", function (event) {
+              if (event.keyCode === 27) {
+                // 27 = Esc key
+                inputDialog.remove();
+              }
+            });
+
+            return false;
+          }
+          if (selectedOption === "insertDate") {
+            editor.s.insertHTML(new Date().toDateString());
+          }
+        },
+      };
+
+      function convertirNumeroATexto(numero) {
+        const digitos = String(numero).split("");
+        const unidades = [
+          "",
+          "uno",
+          "dos",
+          "tres",
+          "cuatro",
+          "cinco",
+          "seis",
+          "siete",
+          "ocho",
+          "nueve",
+        ];
+        const decenas = [
+          "",
+          "diez",
+          "veinte",
+          "treinta",
+          "cuarenta",
+          "cincuenta",
+          "sesenta",
+          "setenta",
+          "ochenta",
+          "noventa",
+        ];
+        const especiales = [
+          "diez",
+          "once",
+          "doce",
+          "trece",
+          "catorce",
+          "quince",
+          "dieciséis",
+          "diecisiete",
+          "dieciocho",
+          "diecinueve",
+        ];
+
+        if (numero < 10) {
+          return unidades[numero];
+        }
+        if (numero < 20) {
+          return especiales[numero - 10];
+        }
+        if (numero % 10 === 0) {
+          return decenas[numero / 10];
+        }
+        return decenas[Math.floor(numero / 10)] + " y " + unidades[numero % 10];
+      }
+
+      Jodit.defaultOptions.controls.variables = {
+        icon: "variables",
+        tooltip: "Variables",
+        list: {
+          option1: "nombre contratante",
+          option2: "nombre vendedor",
+          option3: "nombre abogado",
+        },
+        exec: function (editor, _, control) {
+          const selectedOption = control.control.name;
+          if (selectedOption === "option1") {
+            editor.s.insertHTML("<mark> {{ nombre contratante }} </mark>");
+          }
+          if (selectedOption === "option2") {
+            editor.s.insertHTML("<mark> {{ nombre vendedor }} </mark>");
+          }
+          if (selectedOption === "option3") {
+            const inputDialog = $("<div>", { class: "input-dialog" }).appendTo(
+              "body"
+            );
+            const input = $("<input>", {
+              type: "text",
+              placeholder: "Ingrese el nombre del abogado",
+            }).appendTo(inputDialog);
+            const okButton = $("<button>", { text: "Aceptar" }).appendTo(
+              inputDialog
+            );
+            const cancelButton = $("<button>", { text: "Cancelar" }).appendTo(
+              inputDialog
+            );
+
+            input.focus();
+
+            okButton.on("click", function () {
+              const value = input.val();
+              editor.s.insertHTML("<mark> {{ " + value + " }} </mark>");
+              inputDialog.remove();
+            });
+
+            cancelButton.on("click", function () {
+              inputDialog.remove();
+            });
+
+            inputDialog.on("keydown", function (event) {
+              if (event.keyCode === 27) {
+                // 27 = Esc key
+                inputDialog.remove();
+              }
+            });
+
+            return false;
+          }
+        },
+      };
+
+      Jodit.defaultOptions.controls.addWord = {
+        tooltip: "Enter text and insert",
+        icon: "pencil",
+        popup: (editor, current, self, close) => {
+          const form = editor.create.fromHTML(
+            `<form>
+  	    <input type="text"/>
+  	    <button type="submit">Insert</button>
+  	  </form>`
+          );
+
+          editor.e.on(form, "submit", (e) => {
+            e.preventDefault();
+            editor.s.insertHTML(
+              `<mark>` + form.querySelector("input").value + `</mark>`
+            );
+            close();
+          });
+
+          return form;
+        },
+      };
+
+      const editor = new Jodit("#editor", {
+        buttons: ["funciones", "variables", "addWord"],
+      });
+    </script>
+  </body>
+</html>
